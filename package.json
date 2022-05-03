@@ -1,7 +1,29 @@
 {
   "name": "md-links",
   "version": "0.1.0",
+  "description": "Terminal string get links in markdown files to get info",
+  "author": "Yaisa Arteaga <yaisamichellea@gmail.com> (https://www.linkedin.com/in/yaisa-arteaga/)",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
   "engines": {
     "node": ">=14.x"
+  },
+  "dependencies": {
+    "chalk": "^5.0.1",
+    "jest": "^28.0.2"
+  },
+  "scripts": {
+    "eslint": "eslint --ext .js test/",
+    "pretest": "npm run eslint",
+    "test": "jest --coverage"
+  },
+  "devDependencies": {
+    "eslint": "^8.14.0"
+  },
+  "bin": { 
+    "name": "md-links",
+    "bin": "index.js"
   }
 }
