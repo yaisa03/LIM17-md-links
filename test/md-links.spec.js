@@ -1,7 +1,16 @@
-const mdLinks = require('../');
+const api = require('../index.js');
+const cli = require('../cli.js');
 
 
-describe('mdLinks', () => {
+describe('cli', () => {
+
+  it('should return', () => {
+    cli();
+  });
+
+});
+
+describe('api', () => {
 
   it('should...', () => {
     console.log('FIX ME!');
