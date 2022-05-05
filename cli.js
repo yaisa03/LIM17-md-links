@@ -4,49 +4,53 @@
 const fs = require('fs');
 const path = require('path');
 
-const filePath = process.argv[2];
-// extension del archivo
-const fileExtension = path.extname(filePath);
-
-// leer y mostrar contenido de un archivo
-const printFile = (error, content) => {
-    if (error) {
-        console.log(error)
+const filePathInputed = process.argv[2];
+//const filePath = path.resolve(filePathInputed);
+// ver si la ruta es absoluto o relativo y convertir ruta a absoluta
+const pathToAbsolute = (file) => {
+    if (path.isAbsolute(file)) {
+        return file;
     } else {
-        console.log(filePath);
-        console.log(fileExtension);
-        console.log(content.toString());
+        return path.resolve(file);
     }
 }
-// ver si la ruta es absoluto o relativo
-const validatePathType = (filePath) => {
-    const pathValue = path.isAbsolute(filePath);
-    console.log(pathValue);
-    return pathValue;
-}
-// leer y mostrar contenido de carpetas
-const printDirectoryFiles = (err, files) => {
-    if (err)
-        console.log(err);
-    else {
-        console.log("\nCurrent directory filenames:");
-        files.forEach(file => {
-                 console.log(file);
-            })
-           /*  if (path.extname(file)/fileExtension == ".md")
-                console.log(file);
-        }) */
-    }
-}
+const filePath = pathToAbsolute(filePathInputed);
+// ver si la ruta existe 
+const pathIsVAlid = (file) => fs.existsSync(file);
 // ver si es carpeta o archivo
-const valiateDirectory = fs.statSync(filePath).isDirectory()
+const checkIfDirectory = (file) => fs.statSync(file).isDirectory();
 // mostrar el contenido de la ruta enviada
-const printPathContent = () => {
-    if (!valiateDirectory) {
-        fs.readFile(filePath, printFile);
-        validatePathType(filePath);
+const printPathContent = (file) => {
+    if (!checkIfDirectory(file)) {
+        return printFile(file);
     } else {
-        fs.readdir(filePath, printDirectoryFiles);
+        return printDirectoryFiles(file);
     }
 }
-printPathContent();
+// leer y mostrar contenido de un archivo
+const printFile = (file) => {
+    const fileContent = fs.readFileSync(file);
+    return fileContent.toString();
+};
+// leer y mostrar contenido de carpetas
+const printDirectoryFiles = (dir) => {
+    let filesArray = fs.readdirSync(dir);
+    filesArray = filesArray.filter(file => {
+        if (path.extname(file) == '.md') {
+            return file;
+        }
+    });
+    return filesArray;
+}
+// print the filepath that works
+const filePathWorking = (filePath) => {
+    if (pathIsVAlid(filePath)) {
+        console.log(filePathInputed);
+        console.log(printPathContent(filePath))
+        return printPathContent(filePath);
+    } else {
+        console.log('La ruta no existe');
+    }
+}
+
+filePathWorking(filePath);
