@@ -67,6 +67,6 @@ describe('filePathWorking', () => {
   });
   it('Deberia mostrar un mensaje de error si la ruta no exite', () => {
     expect(filePathWorking('D:\\Laboratoria\\LIM17-md-links\\sub.js')).toBe('La ruta no existe');
-    // expect(pathIsVAlid('D:\\Laboratoria\\LIM17-md-links\\sub.js')).toBe(false);
+    // revisar el throw
   });
 });

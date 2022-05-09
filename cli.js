@@ -23,7 +23,7 @@ const pathIsVAlid = (file) => fs.existsSync(file);
 // ver si es carpeta o archivo
 const checkIfDirectory = (file) => fs.statSync(file).isDirectory();
 // mostrar el contenido de la ruta enviada
-const printPathContent = (file) => (!checkIfDirectory(file)) ? printFile(file): printDirectoryFiles(file);
+const printPathContent = (file) => (!checkIfDirectory(file)) ? printFile(file) : printDirectoryFiles(file);
 /* const printPathContent = (file) => {
     if (!checkIfDirectory(file)) {
         return printFile(file);
@@ -32,7 +32,7 @@ const printPathContent = (file) => (!checkIfDirectory(file)) ? printFile(file): 
     }
 } */
 // leer y mostrar contenido de un archivo
-const printFile = (file) =>  fs.readFileSync(file).toString();
+const printFile = (file) => fs.readFileSync(file).toString();
 /* const printFile = (file) => {
     const fileContent = fs.readFileSync(file);
     return fileContent.toString();
@@ -41,9 +41,7 @@ const printFile = (file) =>  fs.readFileSync(file).toString();
 const printDirectoryFiles = (dir) => {
     let filesArray = fs.readdirSync(dir);
     filesArray = filesArray.filter(file => {
-        if (path.extname(file) == '.md') {
-            return file;
-        }
+        if (path.extname(file) == '.md') return file;
     });
     return filesArray;
 }
