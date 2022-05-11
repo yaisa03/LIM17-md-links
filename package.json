@@ -1,9 +1,13 @@
 {
-  "name": "md-links",
+  "name": "md-links-y",
   "version": "0.1.0",
   "description": "Terminal string get links in markdown files to get info",
   "author": "Yaisa Arteaga <yaisamichellea@gmail.com> (https://www.linkedin.com/in/yaisa-arteaga/)",
   "main": "index.js",
+  "files": [
+    "index.js",
+    "cli.js"
+  ],
   "directories": {
     "test": "test"
   },
@@ -22,8 +26,7 @@
   "devDependencies": {
     "eslint": "^8.14.0"
   },
-  "bin": { 
-    "name": "md-links",
-    "bin": "index.js"
+  "bin": {
+    "md-links": "./cli.js"
   }
 }
