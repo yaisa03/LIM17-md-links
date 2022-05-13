@@ -17,9 +17,9 @@ const checkIfFile = (file) => fs.statSync(file).isFile();
 const checkIfMDFile = (file) => path.extname(file) === '.md';
 // leer y mostrar contenido de un archivo
 const printFile = (file) => fs.readFileSync(file).toString();
+// const printFile = (file) => fs.readFileSync(file, 'utf8');
 // leer y mostrar contenido de carpetas
 const printDirectory = (dir) => fs.readdirSync(dir);
-
 // ontener archivos .md de un directorio
 const getDirectoryFiles = (dir) => {
     const directoryContent = printDirectory(dir);
@@ -31,9 +31,12 @@ const getDirectoryFiles = (dir) => {
                 filesArray.push(currentPath);
             }
         } else {
-            filesArray = filesArray.concat(getDirectoryFiles(currentPath))
+            filesArray = filesArray.concat(getDirectoryFiles(currentPath));
         }
     });
+    if (filesArray.length === 0) {
+        console.log('no hay archivos .md en esta carpeta');
+    }
     return filesArray;
 }
 // obtener contenido de un archivo .md
@@ -53,8 +56,47 @@ const getDirectoryFilesContent = (dir) => {
     });
     return fileContent;
 }
+
+// const
+const extractLinks = (link, mdContents) => {
+    const regexMdLinks = /\[([^\[]+)\](\(.*\))/gm;
+    const matches = mdContents.match(regexMdLinks)
+    //console.log('links', matches);
+    let links = []
+    let linksCount = 0;
+    const singleMatch = /\[([^\[]+)\]\((.*)\)/
+    for (let i = 0; i < matches.length; i++) {
+        const text = singleMatch.exec(matches[i]);
+        const url = `${text[2]}`;
+        if (url.slice(0, 4) === 'http' || url.slice(0, 3) === 'www' ) {
+            /*   console.log(`Match #${i}:`, text)
+                 console.log(`Word  #${i}: ${text[1]}`)
+            // console.log(`Link  #${i}: ${text[2]}`);*/
+            linksCount++;
+            links.push(`Link  #${linksCount}: ${text[2]}`);
+        } else {
+            console.log('no hay links en este archivo');
+        }
+    }
+    console.log(links);
+    console.log(`numero de links: ${linksCount}`);
+    return links;
+
+}
 // imprimir contenido de la ruta
-const printPathContent = (file) => (!checkIfDirectory(file)) ? getFileContent(file) : getDirectoryFilesContent(file);
+const printPathContent = (file) => {
+    if (!checkIfDirectory(file)) {
+        const content = getFileContent(file);
+        return extractLinks(content[0], content[1])
+    } else {
+        const content = getDirectoryFilesContent(file);
+        console.log(content);
+        content.forEach(file => {
+            return extractLinks(file[0], file[1]);
+        });
+        return content;
+    }
+};
 
 // mostrar contenido de rutas validas
 const filePathWorking = (file) => {
@@ -62,7 +104,6 @@ const filePathWorking = (file) => {
     if (pathIsVAlid(filepath)) {
         console.log(file);
         console.log('La ruta es valida');
-        console.log(printPathContent(filepath));
         return printPathContent(filepath);
     } else {
         console.log('La ruta no existe');
@@ -72,7 +113,6 @@ const filePathWorking = (file) => {
 }
 
 filePathWorking(filePath);
-
 
 module.exports = {
     pathToAbsolute, printPathContent, getDirectoryFilesContent,
