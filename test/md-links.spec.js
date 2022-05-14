@@ -1,6 +1,6 @@
 // const api = require('../index.js');
 const { pathToAbsolute,  printPathContent, getDirectoryFilesContent, 
-  filePathWorking, getFileContent } = require('../cli.js');
+  readFileAndDirectory, getFileContent } = require('../cli.js');
 
 
 
@@ -52,13 +52,13 @@ describe('printPathContent,', () => {
 });
 
 
-describe('filePathWorking', () => {
+describe('readFileAndDirectory', () => {
   it('Deberia mostrar contenido del archivo/directorio valido', () => {
-    expect(filePathWorking('D:\\Laboratoria\\LIM17-md-links\\index.js'))
+    expect(readFileAndDirectory('D:\\Laboratoria\\LIM17-md-links\\index.js'))
     .toBe(printPathContent('D:\\Laboratoria\\LIM17-md-links\\index.js'));
   });
   it('Deberia mostrar un mensaje de error si la ruta no exite', () => {
-    expect(filePathWorking('D:\\Laboratoria\\LIM17-md-links\\sub.js')).toBe('La ruta no existe');
+    expect(readFileAndDirectory('D:\\Laboratoria\\LIM17-md-links\\sub.js')).toBe('La ruta no existe');
     // expect(filePathWorking('D:\\Laboratoria\\LIM17-md-links\\sub.js')).toThrow(TypeError);
     // revisar el throw
   });
