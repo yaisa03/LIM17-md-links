@@ -3,11 +3,28 @@
 // const mdLinks = require("./index.js");
 const fs = require('fs');
 const path = require('path');
+const chalk = require('chalk');
+//const yargs = require('yargs');
+//const { hideBin } = require('yargs/helpers');
 
 // argumentos ingresados en la consola
-const myArgs = process.argv.slice(2);
+const myArgs = process.argv.slice(2);//yargs(hideBin(process.argv))
+/* .usage('Usage: md-links <path> [options]')
+.option("v", {
+    alias: "validate",
+    describe: "Validate the links in the .md file",
+    type: "boolean",
+    default: 'false',
+})
+.option("s", {
+    alias: "stats",
+    describe: "Stadistics of the links in the .md file",
+    type: "boolean",
+    default: 'false',
+})
+.argv; */
 // path ingresado en la consola
-const filePath = myArgs[0];
+const filePath = myArgs[0]; //myArgs._.toString();
 // ver si la ruta es absoluto o relativo y convertir ruta a absoluta
 const pathToAbsolute = (file) => (path.isAbsolute(file)) ? file : path.resolve(file);
 // ver si la ruta existe 
@@ -41,7 +58,7 @@ const getDirectoryFiles = (dir) => {
 // obtener contenido de un archivo .md
 const getFileContent = (file) => {
     if (checkIfMDFile(file)) {
-        return printFile(file);
+        return [file, printFile(file)];
     } else {
         return 'no es un archivo .md';
     }
@@ -52,15 +69,16 @@ const getDirectoryFilesContent = (dir) => {
     if (files.length === 0) {
         return 'no hay archivos .md en este directorio';
     } else {
-        return files.map((file) => printFile(file));
+        return files.map((file) => [file, printFile(file)]);
     }
 }
 // extraer links de un archivo .md
 const extractLinks = (mdContents) => {
     const regexMdLinks = /\[([^\[]+)\](\(.*\))/gm;
-    const matches = mdContents.match(regexMdLinks);//console.log('links', matches);
+    const matches = mdContents[1].match(regexMdLinks);//console.log('links', matches);
     let links = [];
     if (matches == null) {
+        console.log(mdContents[0]);
         return 'no hay links en este archivo .md';
     } else {
         const singleMatch = /\[([^\[]+)\]\((.*)\)/
@@ -68,11 +86,12 @@ const extractLinks = (mdContents) => {
             const text = singleMatch.exec(matches[i]);
             const url = `${text[2]}`;
             if (url.slice(0, 4) === 'http') {// console.log(`Match #${i}:`, text);
-                links.push([`${text[1]}`, `${text[2]}`]);
+                links.push([`${text[1]}`, `${text[2]}`, `${mdContents[0]}`]);
             }
         }
     }
     if (links == 0) {
+        console.log(mdContents[0]);
         return 'no hay links de tipo http://';
     }
     return links;
@@ -81,41 +100,59 @@ const extractLinks = (mdContents) => {
 const printPathContent = (file) => {
     if (!checkIfDirectory(file)) {
         const content = getFileContent(file);
-        if (content === 'no es un archivo .md') {
+        if (typeof content === 'string') { /*'no es un archivo .md'*/
             return content;
+        } else {
+            const fileLinks = extractLinks(content);
+            //fileLinks.forEach(link => console.log(chalk.blue(filePath), chalk.green(link[1]), link[0].slice(0, 50)));
+            for (let i = 0; i < fileLinks.length; i++) {
+                console.log(chalk.blue(filePath), chalk.green(fileLinks[i][1]), fileLinks[i][0].slice(0, 50));
+            }
+            return fileLinks;
         }
-        return extractLinks(content);
     } else {
         const content = getDirectoryFilesContent(file);
         if (content === 'no hay archivos .md en este directorio') {
             return content;
         } else {
-            let links;
-            content.forEach(file => links = extractLinks(file));
-            return links;
+            return content.map(file => {
+                const fileLinks = extractLinks(file);
+                for (let i = 0; i < fileLinks.length; i++) {
+                    if (typeof fileLinks[i] === 'string') {
+                        console.log(chalk.red(fileLinks));
+                        return fileLinks;
+                    } else {
+                        console.log(chalk.blue(fileLinks[i][2]), chalk.green(fileLinks[i][1]), fileLinks[i][0].slice(0, 50));
+                    }
+                }
+                return fileLinks;
+            })
         }
     }
-};
+}
 // mostrar contenido de rutas validas
 const readFileAndDirectory = (file) => {
     const filepath = pathToAbsolute(file);
     if (pathIsVAlid(filepath)) {
         const fileLinks = printPathContent(filepath);
         if (typeof fileLinks === 'string') {
-            return console.log(fileLinks);
+            console.log(chalk.red(fileLinks));
+            return fileLinks;
         } else {
-            fileLinks.forEach(link => console.log(file, link[1], link[0].slice(0, 50)));
+            //console.log(fileLinks);
+            // fileLinks.forEach(link => console.log(chalk.blue(file), chalk.green(link[1]), link[0].slice(0, 50)));
             return fileLinks;
         }
     } else {
-        console.log('La ruta no existe');
+        console.log(chalk.red('La ruta no existe: ' + filepath));
         return 'La ruta no existe';
     }
 }
+
 
 readFileAndDirectory(filePath);
 
 module.exports = {
     pathToAbsolute, printPathContent, getDirectoryFilesContent,
-    readFileAndDirectory, getFileContent
+    readFileAndDirectory, getFileContent, extractLinks
 };
