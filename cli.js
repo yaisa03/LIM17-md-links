@@ -24,7 +24,7 @@ const myArgs = process.argv.slice(2);//yargs(hideBin(process.argv))
 })
 .argv; */
 // path ingresado en la consola
-const filePath = myArgs[0]; //myArgs._.toString();
+const fileP = myArgs[0]; //myArgs._.toString();
 // ver si la ruta es absoluto o relativo y convertir ruta a absoluta
 const pathToAbsolute = (file) => (path.isAbsolute(file)) ? file : path.resolve(file);
 // ver si la ruta existe 
@@ -39,7 +39,6 @@ const checkIfMDFile = (file) => path.extname(file) === '.md';
 const printFile = (file) => fs.readFileSync(file).toString();
 // leer y mostrar contenido de carpetas
 const printDirectory = (dir) => fs.readdirSync(dir);
-
 // obtener archivos .md de un directorio
 const getDirectoryFiles = (dir) => {
     let mdFilesArray = [];
@@ -56,13 +55,7 @@ const getDirectoryFiles = (dir) => {
     return mdFilesArray;
 }
 // obtener contenido de un archivo .md
-const getFileContent = (file) => {
-    if (checkIfMDFile(file)) {
-        return [file, printFile(file)];
-    } else {
-        return 'no es un archivo .md';
-    }
-}
+const getFileContent = (file) => (checkIfMDFile(file)) ? [file, printFile(file)] : 'no es un archivo .md';
 // obtener contenido de un archivo .md dentro de un directorio
 const getDirectoryFilesContent = (dir) => {
     const files = getDirectoryFiles(dir);
@@ -78,70 +71,56 @@ const extractLinks = (mdContents) => {
     const matches = mdContents[1].match(regexMdLinks);//console.log('links', matches);
     let links = [];
     if (matches == null) {
-        console.log(mdContents[0]);
-        return 'no hay links en este archivo .md';
+        return (chalk.white(`${mdContents[0]}`) + ' no hay links en este archivo .md');
     } else {
         const singleMatch = /\[([^\[]+)\]\((.*)\)/
         for (let i = 0; i < matches.length; i++) {
             const text = singleMatch.exec(matches[i]);
             const url = `${text[2]}`;
-            if (url.slice(0, 4) === 'http') {// console.log(`Match #${i}:`, text);
+            if (url.slice(0, 4) === 'http') {//console.log(`Match #${i}:`, text);
                 links.push([`${text[1]}`, `${text[2]}`, `${mdContents[0]}`]);
             }
         }
     }
     if (links == 0) {
-        console.log(mdContents[0]);
-        return 'no hay links de tipo http://';
+        return (chalk.white(`${mdContents[0]}`) + ' no hay links de tipo http://');
     }
     return links;
 }
 // imprimir contenido de la ruta
-const printPathContent = (file) => {
+const printPathContent = (file, content) => {
     if (!checkIfDirectory(file)) {
-        const content = getFileContent(file);
-        if (typeof content === 'string') { /*'no es un archivo .md'*/
-            return content;
-        } else {
-            const fileLinks = extractLinks(content);
-            //fileLinks.forEach(link => console.log(chalk.blue(filePath), chalk.green(link[1]), link[0].slice(0, 50)));
+        const fileLinks = extractLinks(content);
+        for (let i = 0; i < fileLinks.length; i++) {
+            console.log(chalk.blue(file), chalk.green(fileLinks[i][1]), fileLinks[i][0].slice(0, 50));
+        }
+        return fileLinks;
+    } else {
+        return content.map(file => {
+            const fileLinks = extractLinks(file);
             for (let i = 0; i < fileLinks.length; i++) {
-                console.log(chalk.blue(filePath), chalk.green(fileLinks[i][1]), fileLinks[i][0].slice(0, 50));
+                if (typeof fileLinks[i] === 'string') {
+                    console.log(chalk.red(fileLinks));
+                    return fileLinks;
+                } else {
+                    console.log(chalk.blue(fileLinks[i][2]), chalk.green(fileLinks[i][1]), fileLinks[i][0].slice(0, 50));
+                }
             }
             return fileLinks;
-        }
-    } else {
-        const content = getDirectoryFilesContent(file);
-        if (content === 'no hay archivos .md en este directorio') {
-            return content;
-        } else {
-            return content.map(file => {
-                const fileLinks = extractLinks(file);
-                for (let i = 0; i < fileLinks.length; i++) {
-                    if (typeof fileLinks[i] === 'string') {
-                        console.log(chalk.red(fileLinks));
-                        return fileLinks;
-                    } else {
-                        console.log(chalk.blue(fileLinks[i][2]), chalk.green(fileLinks[i][1]), fileLinks[i][0].slice(0, 50));
-                    }
-                }
-                return fileLinks;
-            })
-        }
+        })
     }
 }
 // mostrar contenido de rutas validas
-const readFileAndDirectory = (file) => {
-    const filepath = pathToAbsolute(file);
+const filepath = pathToAbsolute(fileP);
+const readFileAndDirectory = (filePath) => {
     if (pathIsVAlid(filepath)) {
-        const fileLinks = printPathContent(filepath);
-        if (typeof fileLinks === 'string') {
-            console.log(chalk.red(fileLinks));
-            return fileLinks;
+        let content;
+        (!checkIfDirectory(filePath)) ? content = getFileContent(filePath) : content = getDirectoryFilesContent(filePath);
+        if (typeof content === 'string') { //'no es un archivo .md'
+            console.log(chalk.red(content))
+            return content;
         } else {
-            //console.log(fileLinks);
-            // fileLinks.forEach(link => console.log(chalk.blue(file), chalk.green(link[1]), link[0].slice(0, 50)));
-            return fileLinks;
+            return content;
         }
     } else {
         console.log(chalk.red('La ruta no existe: ' + filepath));
@@ -149,8 +128,20 @@ const readFileAndDirectory = (file) => {
     }
 }
 
+const showByOption = (filepath) => {
+    if (myArgs[1] === '--validate') {
+        console.log('opcion validate');
+    } else if (myArgs[1] === '--stats') {
+        console.log('opcion stats');
+    } else if (myArgs.includes('--validate --stats')) {
+        console.log('opcion stats y validate');
+    } else {
+        const content = readFileAndDirectory(filepath);
+        printPathContent(filepath, content);
+    }
+}
 
-readFileAndDirectory(filePath);
+showByOption(filepath);
 
 module.exports = {
     pathToAbsolute, printPathContent, getDirectoryFilesContent,
