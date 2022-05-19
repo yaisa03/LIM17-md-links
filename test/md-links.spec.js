@@ -49,8 +49,8 @@ describe('printPathContent,', () => {
   });
   it('No deberia imprimir contenido de un archivo', () => {
     const file = 'D:\\Laboratoria\\LIM17-md-links\\index.js';
-    expect(printPathContent(file, getFileContent(file)))
-      .toBe('no es un archivo .md');
+    expect(typeof printPathContent(file, getFileContent(file)))
+      .toBe('string');
   });
   it('Deberia imprimir contenido de un archivo', () => {
     const dir = 'D:\\Laboratoria\\LIM17-md-links\\testDirTwo\\fileThree.md';
@@ -64,7 +64,7 @@ describe('readFileAndDirectory', () => {
   it('Deberia mostrar contenido del archivo/directorio valido', () => {
     const file = 'D:\\Laboratoria\\LIM17-md-links\\index.js';
     expect(readFileAndDirectory(file))
-      .toBe(printPathContent(file, getFileContent(file)));
+      .toBe('no es un archivo .md');
   });
   it('Deberia mostrar contenido del archivo/directorio valido', () => {
     const file = 'D:\\Laboratoria\\LIM17-md-links\\README.md';

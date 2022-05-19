@@ -24,7 +24,7 @@ const myArgs = process.argv.slice(2);//yargs(hideBin(process.argv))
 })
 .argv; */
 // path ingresado en la consola
-const fileP = myArgs[0]; //myArgs._.toString();
+const filePath = myArgs[0]; //myArgs._.toString();
 // ver si la ruta es absoluto o relativo y convertir ruta a absoluta
 const pathToAbsolute = (file) => (path.isAbsolute(file)) ? file : path.resolve(file);
 // ver si la ruta existe 
@@ -59,11 +59,7 @@ const getFileContent = (file) => (checkIfMDFile(file)) ? [file, printFile(file)]
 // obtener contenido de un archivo .md dentro de un directorio
 const getDirectoryFilesContent = (dir) => {
     const files = getDirectoryFiles(dir);
-    if (files.length === 0) {
-        return 'no hay archivos .md en este directorio';
-    } else {
-        return files.map((file) => [file, printFile(file)]);
-    }
+    return (files.length === 0)? 'no hay archivos .md en este directorio' : files.map((file) => [file, printFile(file)]);
 }
 // extraer links de un archivo .md
 const extractLinks = (mdContents) => {
@@ -77,7 +73,7 @@ const extractLinks = (mdContents) => {
         for (let i = 0; i < matches.length; i++) {
             const text = singleMatch.exec(matches[i]);
             const url = `${text[2]}`;
-            if (url.slice(0, 4) === 'http') {//console.log(`Match #${i}:`, text);
+            if (url.slice(0, 4) === 'http') {// console.log(`Match #${i}:`, text);
                 links.push([`${text[1]}`, `${text[2]}`, `${mdContents[0]}`]);
             }
         }
@@ -92,7 +88,7 @@ const printPathContent = (file, content) => {
     if (!checkIfDirectory(file)) {
         const fileLinks = extractLinks(content);
         for (let i = 0; i < fileLinks.length; i++) {
-            console.log(chalk.blue(file), chalk.green(fileLinks[i][1]), fileLinks[i][0].slice(0, 50));
+            console.log(chalk.blue(filePath), chalk.green(fileLinks[i][1]), fileLinks[i][0].slice(0, 50));
         }
         return fileLinks;
     } else {
@@ -110,17 +106,29 @@ const printPathContent = (file, content) => {
         })
     }
 }
+
+/* const optionValidate = (ifileContent) =>{
+
+} */
 // mostrar contenido de rutas validas
-const filepath = pathToAbsolute(fileP);
-const readFileAndDirectory = (filePath) => {
+const readFileAndDirectory = (file) => {
+    const filepath = pathToAbsolute(file);
     if (pathIsVAlid(filepath)) {
         let content;
-        (!checkIfDirectory(filePath)) ? content = getFileContent(filePath) : content = getDirectoryFilesContent(filePath);
+        (!checkIfDirectory(file)) ? content = getFileContent(file) : content = getDirectoryFilesContent(file);
         if (typeof content === 'string') { //'no es un archivo .md'
             console.log(chalk.red(content))
             return content;
         } else {
-            return content;
+            if (myArgs[1] === '--validate') {
+                console.log('opcion validate');
+            } else if (myArgs[1] === '--stats') {
+                console.log('opcion stats');
+            } else if (myArgs.includes('--validate --stats')) {
+                console.log('opcion stats y validate');
+            } else {
+                return printPathContent(filepath, content);
+            }
         }
     } else {
         console.log(chalk.red('La ruta no existe: ' + filepath));
@@ -128,20 +136,7 @@ const readFileAndDirectory = (filePath) => {
     }
 }
 
-const showByOption = (filepath) => {
-    if (myArgs[1] === '--validate') {
-        console.log('opcion validate');
-    } else if (myArgs[1] === '--stats') {
-        console.log('opcion stats');
-    } else if (myArgs.includes('--validate --stats')) {
-        console.log('opcion stats y validate');
-    } else {
-        const content = readFileAndDirectory(filepath);
-        printPathContent(filepath, content);
-    }
-}
-
-showByOption(filepath);
+readFileAndDirectory(filePath);
 
 module.exports = {
     pathToAbsolute, printPathContent, getDirectoryFilesContent,
