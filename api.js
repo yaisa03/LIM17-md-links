@@ -1,17 +1,31 @@
-module.exports = () => {
-    // ..00.
-    mdLinks;
-};
-const { extractLinks } = require('./index.js');
+
+const { stats, validate } = require('./index.js');
 
 
 const mdLinks = (path, options) => {
-    return new Promise((resolve, reject) => {
-        if (options === { validate: true }) {
-            resolve(extractLinks(path));
-        } else if (options === { validate: false }) {
-            return;
+    return new Promise((resolve) => {
+        if (options.stats && options.validate) {
+            resolve('opcion stats y validate');
+
+        } else if (options.validate) {
+            validate(path).then((files) => {
+                resolve(files);
+            });
+
+        } else if (options.stats) {
+            resolve(stats(path));
+
+        } else {
+            if (path.length === 0) {
+                resolve('no hay links');
+            } else {
+                resolve(path);
+            }
         }
-    })
+    });
 }
+
+module.exports = {
+    mdLinks,
+};
 

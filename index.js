@@ -18,7 +18,7 @@ const printFile = (file) => fs.readFileSync(file).toString();
 const printDirectory = (dir) => fs.readdirSync(dir);
 
 // recorrer rutas y extraer archivos.md en un array
-const getPathsFiles = (Path) => {
+const getPathFiles = (Path) => {
   const filepath = pathToAbsolute(Path);
   let mdFilesArray = [];
 
@@ -33,7 +33,7 @@ const getPathsFiles = (Path) => {
     } else {
       printDirectory(filepath).forEach(file => {
         let currentPath = path.join(filepath, file);
-        mdFilesArray = mdFilesArray.concat(getPathsFiles(currentPath));
+        mdFilesArray = mdFilesArray.concat(getPathFiles(currentPath));
       });
     }
     return mdFilesArray;
@@ -43,7 +43,7 @@ const getPathsFiles = (Path) => {
 
 // obtener links dentro de un archivo .md
 const extractLinks = (path) => {
-  const mdFilesArray = getPathsFiles(path); //console.log(mdFilesArray);
+  const mdFilesArray = getPathFiles(path);
   if (typeof mdFilesArray === 'string') return mdFilesArray;
 
   else {
@@ -54,20 +54,19 @@ const extractLinks = (path) => {
       else {
         const fileContent = printFile(File);
         const regexMdLinks = /\[([^\[]+)\](\(.*\))/gm; ///\[([^\[]+)\]\(http?(.*)\)/gm
+        const singleMatch = /\[([^\[]+)\]\((.*)\)/;
         const matches = fileContent.match(regexMdLinks);
-        const singleMatch = /\[([^\[]+)\]\((.*)\)/;// console.log('links', matches);
+
+        if (matches == null) return; // console.error(File, ('no hay links en este archivo .md'));
         
-        if (matches == null) return;// console.error(File, chalk.red('no hay links en este archivo .md'));
-        else {
-          for (let i = 0; i < matches.length; i++) {
-            const text = singleMatch.exec(matches[i]);
-            if (text[2].slice(0, 4) === 'http') {//console.log(`Match #${i}:`, text);
-              links.push({
-                href: `${text[2]}`,
-                text: `${text[1]}`,
-                file: File
-              });
-            }
+        for (let i = 0; i < matches.length; i++) {
+          const text = singleMatch.exec(matches[i]);
+          if (text[2].slice(0, 4) === 'http') {
+            links.push({
+              href: `${text[2]}`,
+              text: `${text[1]}`,
+              file: File
+            });
           }
         }
       }
@@ -77,7 +76,7 @@ const extractLinks = (path) => {
 }
 
 // cantidad de links totales y unicos
-const stats = (fileLinks) => { // const fileLinks = extractLinks(path);
+const stats = (fileLinks) => {
   if (typeof fileLinks !== 'string') {
     const fileLinksUnique = new Set(fileLinks.map(e => e.href));
     return {
@@ -87,20 +86,33 @@ const stats = (fileLinks) => { // const fileLinks = extractLinks(path);
   }
 }
 
+// validar estado de los links con uan peticion http
 const validate = (fileLinks) => {
-  fileLinks.map(content => {
-    axios.get(content.href).then((response) => {
-      console.log({
-        href: content.href,
-        text: content.text,
-        file: content.file,
-        status: response.status,
-        statusText: response.statusText
+  const linksInfo = fileLinks.map(content => {
+    const statusInfo = axios.get(content.href)
+      .then((response) => {
+        return {
+          href: content.href,
+          text: content.text,
+          file: content.file,
+          status: response.status,
+          statusText: response.statusText
+        }
       })
-    }).catch((error) => (error))
-  })
+      .catch(() => {
+        return {
+          href: content.href,
+          text: content.text,
+          file: content.file,
+          status: '',
+          statusText: 'fail'
+        }
+      });
+    return statusInfo;
+  });
+  return Promise.all(linksInfo);
 }
 
 module.exports = {
-  pathToAbsolute, getPathsFiles, extractLinks, stats, validate,
+  pathToAbsolute, getPathFiles, extractLinks, stats, validate,
 };

@@ -1,16 +1,26 @@
 // const api = require('../index.js');
 const {
-  getPathsFiles, extractLinks, stats,
+  pathToAbsolute, getPathFiles, extractLinks, stats,
 } = require('../index.js');
 
-describe('getPathsFiles', () => {
+describe('pathToAbsolute', () => {
+  it('Debería retornar la misma ruta', () => {
+    expect(pathToAbsolute('D:\\Laboratoria\\LIM17-md-links\\README.md'))
+      .toBe('D:\\Laboratoria\\LIM17-md-links\\README.md');
+  });
+  it('Debería retornar la ruta convertida a absoluta', () => {
+    expect(pathToAbsolute('README.md')).toBe('D:\\Laboratoria\\LIM17-md-links\\README.md');
+  });
+});
+
+describe('getPathFiles', () => {
   it('deberia devolver el contenido de las rutas', () => {
     const file = 'D:\\Laboratoria\\LIM17-md-links\\testDirThree';
-    expect(typeof getPathsFiles(file)).toBe('object');
+    expect(typeof getPathFiles(file)).toBe('object');
   })
-  it('deberia devolver el contenidos de las rutas', () => {
+  it('Deberia mostrar un mensaje de error si la ruta no exite', () => {
     const file = 'D:\\Laboratoria\\LIM17-md-links\\testDirThre';
-    expect(typeof getPathsFiles(file)).toBe('string');
+    expect(getPathFiles(file)).toBe('La ruta no existe');
   })
 })
 
