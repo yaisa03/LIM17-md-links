@@ -74,7 +74,6 @@ const extractLinks = (path) => {
     return links;
   }
 }
-
 // cantidad de links totales y unicos
 const stats = (fileLinks) => {
   if (typeof fileLinks !== 'string') {
@@ -99,12 +98,12 @@ const validate = (fileLinks) => {
           statusText: response.statusText
         }
       })
-      .catch(() => {
+      .catch((error) => {
         return {
           href: content.href,
           text: content.text,
           file: content.file,
-          status: '',
+          status: error.code,
           statusText: 'fail'
         }
       });

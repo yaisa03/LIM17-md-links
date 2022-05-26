@@ -3,7 +3,7 @@ const { stats, validate } = require('./index.js');
 
 
 const mdLinks = (path, options) => {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         if (options.stats && options.validate) {
             resolve('opcion stats y validate');
 

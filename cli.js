@@ -3,7 +3,7 @@
 const chalk = require('chalk');
 const yargs = require('yargs');
 const { hideBin } = require('yargs/helpers');
-const { extractLinks, stats, validate } = require('./index.js');
+const { extractLinks } = require('./index.js');
 const { mdLinks } = require('./api.js');
 
 // argumentos ingresados en la consola
