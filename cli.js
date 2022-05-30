@@ -37,14 +37,14 @@ const inputOptions = (paths, options) => {
                 console.log(`Unique: ${stats.unique}`);
                 console.log(`Broken: ${stats.broken}`);
             });
-        })
+        }).catch(err => console.log(err));
 
     } else if (options.validate) {
         mdLinks(paths, options).then((files) => {
             files.forEach((fileInfo) => {
                 console.log(chalk.blue(`${fileInfo.file}`), chalk.green(`${fileInfo.href}`), fileInfo.statusText, fileInfo.status);
             })
-        })
+        }).catch(err => console.log(err));
 
     } else if (options.stats) {
         mdLinks(paths, options).then((pathLinks) => {
@@ -52,7 +52,7 @@ const inputOptions = (paths, options) => {
             console.log(linkStats.file);
             console.log(`Total: ${linkStats.total}`);
             console.log(`Unique: ${linkStats.unique}`);
-        })
+        }).catch(err => console.log(err));
 
     } else {
         mdLinks(paths, options).then((pathInfo) => {

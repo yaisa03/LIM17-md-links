@@ -1,5 +1,5 @@
 
-const { extractLinks, validate, } = require('./index.js');
+const { extractLinks, validate, pathToAbsolute, pathIsVAlid } = require('./index.js');
 
 
 const mdLinks = (path, options) => {
@@ -7,18 +7,24 @@ const mdLinks = (path, options) => {
         if (!path) {
             reject('Ingrese una ruta');
         } else {
-            const pathLinks = extractLinks(path);
-            if (options.validate) {
-                validate(pathLinks).then((files) => {
-                    resolve(files);
-                });
-            } else {
+            const filepath = pathToAbsolute(path);
+
+            if (pathIsVAlid(filepath)) {
+                const pathLinks = extractLinks(filepath);
+                
                 if (pathLinks.length === 0) {
-                    resolve('no hay links');
+                    reject('no hay links');
                 } else {
-                    resolve(pathLinks);
+                    if (options.validate) {
+                        validate(pathLinks).then((files) => {
+                            resolve(files);
+                        });
+                    } else {
+                        resolve(pathLinks);
+                    }
                 }
-            }
+
+            } else reject('La ruta no existe');
         }
     });
 }

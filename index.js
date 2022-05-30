@@ -18,27 +18,22 @@ const printFile = (file) => fs.readFileSync(file).toString();
 const printDirectory = (dir) => fs.readdirSync(dir);
 
 // recorrer rutas y extraer archivos.md en un array
-const getPathFiles = (Path) => {
-  const filepath = pathToAbsolute(Path);
+const getPathFiles = (filepath) => {
   let mdFilesArray = [];
+  if (checkIfFile(filepath)) {
 
-  if (pathIsVAlid(filepath)) {
-    if (checkIfFile(filepath)) {
+    if (checkIfMDFile(filepath)) {
+      mdFilesArray.push(filepath);
 
-      if (checkIfMDFile(filepath)) {
-        mdFilesArray.push(filepath);
+    } else return 'no es un archivo .md';
 
-      } else return 'no es un archivo .md';
-
-    } else {
-      printDirectory(filepath).forEach(file => {
-        let currentPath = path.join(filepath, file);
-        mdFilesArray = mdFilesArray.concat(getPathFiles(currentPath));
-      });
-    }
-    return mdFilesArray;
-
-  } else return 'La ruta no existe';
+  } else {
+    printDirectory(filepath).forEach(file => {
+      let currentPath = path.join(filepath, file);
+      mdFilesArray = mdFilesArray.concat(getPathFiles(currentPath));
+    });
+  }
+  return mdFilesArray;
 }
 
 // obtener links dentro de un archivo .md
@@ -50,7 +45,6 @@ const extractLinks = (path) => {
   else {
     let links = [];
     mdFilesArray.forEach((File) => {
-
       if (File === 'no es un archivo .md') return File;
       else {
         const fileContent = printFile(File);
@@ -77,19 +71,13 @@ const extractLinks = (path) => {
 }
 // cantidad de links totales y unicos
 const stats = (fileLinks) => {
-  if (typeof fileLinks !== 'string') {
+  if (typeof fileLinks === 'object') {
     const fileLinksUnique = new Set(fileLinks.map(e => e.href));
     return {
       file: fileLinks[1].file,
       total: fileLinks.length,
       unique: fileLinksUnique.size,
     }
-  } else {
-    return {
-      file: 'No hay links',
-      total: 0,
-      unique: 0
-    };
   }
 }
 
@@ -99,9 +87,6 @@ const validate = (fileLinks) => {
     const statusInfo = axios.get(content.href)
       .then((response) => {
         return {
-          /*  href: content.href,
-           text: content.text,
-           file: content.file, */
           ...content,
           status: response.status,
           statusText: response.statusText
@@ -109,9 +94,6 @@ const validate = (fileLinks) => {
       })
       .catch((error) => {
         return {
-          /* href: content.href,
-          text: content.text,
-          file: content.file, */
           ...content,
           status: error.code,
           statusText: 'fail'
@@ -140,5 +122,5 @@ const statsAndValidate = (fileLinks) => {
 }
 
 module.exports = {
-  pathToAbsolute, getPathFiles, extractLinks, stats, validate, statsAndValidate,
+  pathToAbsolute, getPathFiles, extractLinks, stats, validate, statsAndValidate, pathIsVAlid,
 };
