@@ -44,6 +44,7 @@ const getPathFiles = (Path) => {
 // obtener links dentro de un archivo .md
 const extractLinks = (path) => {
   const mdFilesArray = getPathFiles(path);
+
   if (typeof mdFilesArray === 'string') return mdFilesArray;
 
   else {
@@ -57,8 +58,8 @@ const extractLinks = (path) => {
         const singleMatch = /\[([^\[]+)\]\((.*)\)/;
         const matches = fileContent.match(regexMdLinks);
 
-        if (matches == null) return; // console.error(File, ('no hay links en este archivo .md'));
-        
+        if (matches == null) return; // 'no hay links en este archivo .md';
+
         for (let i = 0; i < matches.length; i++) {
           const text = singleMatch.exec(matches[i]);
           if (text[2].slice(0, 4) === 'http') {
@@ -79,9 +80,16 @@ const stats = (fileLinks) => {
   if (typeof fileLinks !== 'string') {
     const fileLinksUnique = new Set(fileLinks.map(e => e.href));
     return {
+      file: fileLinks[1].file,
       total: fileLinks.length,
       unique: fileLinksUnique.size,
     }
+  } else {
+    return {
+      file: 'No hay links',
+      total: 0,
+      unique: 0
+    };
   }
 }
 
@@ -91,18 +99,20 @@ const validate = (fileLinks) => {
     const statusInfo = axios.get(content.href)
       .then((response) => {
         return {
-          href: content.href,
-          text: content.text,
-          file: content.file,
+          /*  href: content.href,
+           text: content.text,
+           file: content.file, */
+          ...content,
           status: response.status,
           statusText: response.statusText
         }
       })
       .catch((error) => {
         return {
-          href: content.href,
+          /* href: content.href,
           text: content.text,
-          file: content.file,
+          file: content.file, */
+          ...content,
           status: error.code,
           statusText: 'fail'
         }
@@ -112,6 +122,23 @@ const validate = (fileLinks) => {
   return Promise.all(linksInfo);
 }
 
+const statsAndValidate = (fileLinks) => {
+  const fileStats = stats(fileLinks);
+  let linksBroken = 0;
+  const brokenLinks = validate(fileLinks).then(links => {
+    links.forEach(e => {
+      if (e.statusText === 'fail') {
+        linksBroken++;
+      }
+    });
+    return {
+      ...fileStats,
+      broken: linksBroken,
+    }
+  })
+  return brokenLinks;
+}
+
 module.exports = {
-  pathToAbsolute, getPathFiles, extractLinks, stats, validate,
+  pathToAbsolute, getPathFiles, extractLinks, stats, validate, statsAndValidate,
 };

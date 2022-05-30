@@ -3,7 +3,7 @@
 const chalk = require('chalk');
 const yargs = require('yargs');
 const { hideBin } = require('yargs/helpers');
-const { extractLinks } = require('./index.js');
+const { extractLinks, stats, statsAndValidate} = require('./index.js');
 const { mdLinks } = require('./api.js');
 
 // argumentos ingresados en la consola
@@ -27,44 +27,45 @@ const myArgs = yargs(hideBin(process.argv))
 // path ingresado en la consola
 const filePath = myArgs._.toString();
 
-//
+//funcion que hace que cli funcione
 const inputOptions = (paths, options) => {
-    const fileLinks = extractLinks(paths);
-
     if (options.stats && options.validate) {
-        mdLinks(fileLinks, options).then((validStats) => {
-            console.log(validStats);
+        mdLinks(paths, options).then((validStats) => {
+            statsAndValidate(validStats).then((stats) => {
+                console.log(stats.file);
+                console.log(`Total: ${stats.total}`);
+                console.log(`Unique: ${stats.unique}`);
+                console.log(`Broken: ${stats.broken}`);
+            });
         })
 
     } else if (options.validate) {
-        mdLinks(fileLinks, options).then((files) => {
+        mdLinks(paths, options).then((files) => {
             files.forEach((fileInfo) => {
-                console.log(fileInfo.file, fileInfo.href, fileInfo.statusText, fileInfo.status);
+                console.log(chalk.blue(`${fileInfo.file}`), chalk.green(`${fileInfo.href}`), fileInfo.statusText, fileInfo.status);
             })
         })
 
     } else if (options.stats) {
-        mdLinks(fileLinks, options).then((linkStats) => {
-            console.log(fileLinks[1].file);
+        mdLinks(paths, options).then((pathLinks) => {
+            const linkStats = stats(pathLinks);
+            console.log(linkStats.file);
             console.log(`Total: ${linkStats.total}`);
             console.log(`Unique: ${linkStats.unique}`);
         })
 
-
     } else {
-        if (fileLinks.length === 0) {
-            mdLinks(fileLinks, options).then((filesInfo) => { console.log(chalk.red(filesInfo)) })
-        } else if (typeof fileLinks === 'string') {
-            mdLinks(fileLinks, options).then((filesInfo) => { console.log(chalk.red(filesInfo)) })
-        } else {
-            mdLinks(fileLinks, options).then((filesInfo) => {
-                filesInfo.forEach(content => {
+        mdLinks(paths, options).then((pathInfo) => {
+            if (typeof pathInfo === 'string') {
+                console.log(chalk.red(pathInfo));
+            } else {
+                pathInfo.forEach(content => {
                     console.log(chalk.blue(`${content.file}`), chalk.green(`${content.href}`), `${content.text}`);
                 });
-            });
-        }
-
+            }
+        }).catch(err => console.log(err));
     }
+
 }
 
 inputOptions(filePath, myArgs);
