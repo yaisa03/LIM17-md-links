@@ -120,7 +120,7 @@ describe('mdLinks', () => {
     .catch(err => {
       expect(err).toBe('No hay links');
     }));
-  it('Deberia devolver cuando la ruta ingresada no es un archivo .md', () => mdLinks('index.js', { validate: true })
+  it('Deberia devolver cuando la ruta ingresada no es un archivo .md', () => mdLinks('test\\testDirThree\\testDirOne\\file.html', { validate: true })
     .catch(err => {
       expect(err).toBe('No es un archivo .md');
     }));

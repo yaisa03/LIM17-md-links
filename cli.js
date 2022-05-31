@@ -8,19 +8,24 @@ const { mdLinks } = require('./api.js');
 
 // argumentos ingresados en la consola
 const myArgs = yargs(hideBin(process.argv))
-    .usage('Usage: md-links <path> [options]')
+    .usage('Uso: md-links <path> [options]')
+    .example("md-links <path>", "Muestra ruta, enlaces y texto")
+    .example("md-links <path> -v", "Muestra ruta, texto, enlace, status y mensaje")
+    .example("md-links <path> -s", "Muestra los links totales y unicos")
+    .example("md-links <path> -s -v", " Muestra los enlaces totales, unicos y rotos")
     .option("v", {
         alias: "validate",
-        describe: "Validate the links in the .md file",
+        describe: "Valida que funcionen los links dentro de los archivos .md",
         type: "boolean",
         default: false,
     })
     .option("s", {
         alias: "stats",
-        describe: "Stadistics of the links in the .md file",
+        describe: "Muestra estadisticas de los links dentro de los archivos .md",
         type: "boolean",
         default: false,
     })
+    .help('h')
     .alias('h', 'help')
     .argv;
 
