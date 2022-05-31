@@ -11,17 +11,19 @@ const mdLinks = (path, options) => {
 
             if (pathIsVAlid(filepath)) {
                 const pathLinks = extractLinks(filepath);
-                
+
                 if (pathLinks.length === 0) {
-                    reject('no hay links');
+                    reject('No hay links');
+                }
+                if (typeof pathLinks === 'string') {
+                    reject(pathLinks);
+                }
+                if (options.validate) {
+                    validate(pathLinks).then((files) => {
+                        resolve(files);
+                    });
                 } else {
-                    if (options.validate) {
-                        validate(pathLinks).then((files) => {
-                            resolve(files);
-                        });
-                    } else {
-                        resolve(pathLinks);
-                    }
+                    resolve(pathLinks);
                 }
 
             } else reject('La ruta no existe');

@@ -3,7 +3,7 @@
 const chalk = require('chalk');
 const yargs = require('yargs');
 const { hideBin } = require('yargs/helpers');
-const { extractLinks, stats, statsAndValidate} = require('./index.js');
+const { stats, statsAndValidate } = require('./index.js');
 const { mdLinks } = require('./api.js');
 
 // argumentos ingresados en la consola
@@ -32,27 +32,27 @@ const inputOptions = (paths, options) => {
     if (options.stats && options.validate) {
         mdLinks(paths, options).then((validStats) => {
             statsAndValidate(validStats).then((stats) => {
-                console.log(stats.file);
-                console.log(`Total: ${stats.total}`);
-                console.log(`Unique: ${stats.unique}`);
-                console.log(`Broken: ${stats.broken}`);
+                console.log(chalk.magenta(`${stats.file}`));
+                console.log(chalk.green(`Total: ${stats.total}`));
+                console.log(chalk.blue(`Unique: ${stats.unique}`));
+                console.log(chalk.red(`Broken: ${stats.broken}`));
             });
-        }).catch(err => console.log(err));
+        }).catch(err => console.log(chalk.red(err)));
 
     } else if (options.validate) {
         mdLinks(paths, options).then((files) => {
             files.forEach((fileInfo) => {
                 console.log(chalk.blue(`${fileInfo.file}`), chalk.green(`${fileInfo.href}`), fileInfo.statusText, fileInfo.status);
             })
-        }).catch(err => console.log(err));
+        }).catch(err => console.log(chalk.red(err)));
 
     } else if (options.stats) {
         mdLinks(paths, options).then((pathLinks) => {
             const linkStats = stats(pathLinks);
-            console.log(linkStats.file);
-            console.log(`Total: ${linkStats.total}`);
-            console.log(`Unique: ${linkStats.unique}`);
-        }).catch(err => console.log(err));
+            console.log(chalk.magenta(`${linkStats.file}`));
+            console.log(chalk.green(`Total: ${linkStats.total}`));
+            console.log(chalk.blue(`Unique: ${linkStats.unique}`));
+        }).catch(err => console.log(chalk.red(err)));
 
     } else {
         mdLinks(paths, options).then((pathInfo) => {
@@ -63,7 +63,7 @@ const inputOptions = (paths, options) => {
                     console.log(chalk.blue(`${content.file}`), chalk.green(`${content.href}`), `${content.text}`);
                 });
             }
-        }).catch(err => console.log(err));
+        }).catch(err => console.log(chalk.red(err)));
     }
 
 }

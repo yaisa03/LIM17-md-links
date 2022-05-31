@@ -25,7 +25,7 @@ const getPathFiles = (filepath) => {
     if (checkIfMDFile(filepath)) {
       mdFilesArray.push(filepath);
 
-    } else return 'no es un archivo .md';
+    } else return 'No es un archivo .md';
 
   } else {
     printDirectory(filepath).forEach(file => {
@@ -39,45 +39,39 @@ const getPathFiles = (filepath) => {
 // obtener links dentro de un archivo .md
 const extractLinks = (path) => {
   const mdFilesArray = getPathFiles(path);
-
   if (typeof mdFilesArray === 'string') return mdFilesArray;
 
-  else {
-    let links = [];
-    mdFilesArray.forEach((File) => {
-      if (File === 'no es un archivo .md') return File;
-      else {
-        const fileContent = printFile(File);
-        const regexMdLinks = /\[([^\[]+)\](\(.*\))/gm; ///\[([^\[]+)\]\(http?(.*)\)/gm
-        const singleMatch = /\[([^\[]+)\]\((.*)\)/;
-        const matches = fileContent.match(regexMdLinks);
+  let links = [];
+  mdFilesArray.forEach((File) => {
+    if (File === 'No es un archivo .md') return File;
 
-        if (matches == null) return; // 'no hay links en este archivo .md';
+    const fileContent = printFile(File);
+    const regexMdLinks = /\[([^\[]+)\](\(.*\))/gm; ///\[([^\[]+)\]\(http?(.*)\)/gm
+    const singleMatch = /\[([^\[]+)\]\((.*)\)/;
+    const matches = fileContent.match(regexMdLinks);
 
-        for (let i = 0; i < matches.length; i++) {
-          const text = singleMatch.exec(matches[i]);
-          if (text[2].slice(0, 4) === 'http') {
-            links.push({
-              href: `${text[2]}`,
-              text: `${text[1]}`,
-              file: File
-            });
-          }
-        }
+    if (matches == null) return; // 'no hay links en este archivo .md';
+
+    for (let i = 0; i < matches.length; i++) {
+      const text = singleMatch.exec(matches[i]);
+      if (text[2].slice(0, 4) === 'http') {
+        links.push({
+          href: `${text[2]}`,
+          text: `${text[1]}`,
+          file: File
+        });
       }
-    })
-    return links;
-  }
+    }
+  })
+  return links;
 }
 // cantidad de links totales y unicos
 const stats = (fileLinks) => {
-  if (typeof fileLinks === 'object') {
-    const fileLinksUnique = new Set(fileLinks.map(e => e.href));
-    return {
-      file: fileLinks[1].file,
-      total: fileLinks.length,
-      unique: fileLinksUnique.size,
-    }
+  const fileLinksUnique = new Set(fileLinks.map(e => e.href));
+  return {
+    file: fileLinks[1].file,
+    total: fileLinks.length,
+    unique: fileLinksUnique.size,
   }
 }
 
@@ -105,13 +99,11 @@ const validate = (fileLinks) => {
 }
 
 const statsAndValidate = (fileLinks) => {
-  const fileStats = stats(fileLinks);
   let linksBroken = 0;
+  const fileStats = stats(fileLinks);
   const brokenLinks = validate(fileLinks).then(links => {
     links.forEach(e => {
-      if (e.statusText === 'fail') {
-        linksBroken++;
-      }
+      if (e.statusText === 'fail') return linksBroken++;
     });
     return {
       ...fileStats,

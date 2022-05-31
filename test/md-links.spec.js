@@ -3,6 +3,8 @@ const {
   pathToAbsolute, getPathFiles, extractLinks, stats, validate, statsAndValidate,
 } = require('../index.js');
 
+const { mdLinks } = require('../api.js');
+
 describe('pathToAbsolute', () => {
   it('Debería retornar la misma ruta', () => {
     expect(pathToAbsolute('D:\\Laboratoria\\LIM17-md-links\\README.md'))
@@ -34,6 +36,7 @@ describe('stats', () => {
     expect(typeof stats(fileLinks)).toBe('object');
   })
 })
+
 const mockData = [
   {
     "file": "D:\\Laboratoria\\LIM17-md-links\\testDirThree\\file.md",
@@ -51,7 +54,7 @@ const mockData = [
   }
 ]
 describe('validate', () => {
-  it('deberia devolver datos de los links extraidos de las rutas', () => {
+  it('deberia devolver un object', () => {
     const file = 'D:\\Laboratoria\\LIM17-md-links\\testDirThree';
     const fileLinks = extractLinks(file);
     expect(typeof validate(fileLinks)).toBe('object');
@@ -80,4 +83,45 @@ describe('statsAndValidate', () => {
     }
     return expect(statsAndValidate(fileLinks)).resolves.toEqual(linksData);
   })
+
+  const file = 'D:\\Laboratoria\\LIM17-md-links\\README.md';
+  const fileLinks = extractLinks(file);
+  const linksData = {
+    "broken": 4,
+    "file": "D:\\Laboratoria\\LIM17-md-links\\README.md",
+    "total": 71,
+    "unique": 67
+  }
+  it('deberia devolver datos de los links extraidos de las rutas', () => statsAndValidate(fileLinks)
+    .then(response => {
+      expect(response).toStrictEqual(linksData);
+    }));
 })
+
+describe('mdLinks', () => {
+  const path = 'testDirThree';
+  it('Deberia devolver cuando validate es false', () => mdLinks(path, { validate: false })
+    .then(response => {
+      expect(typeof (response)).toBe('object');
+    }));
+  it('Deberia devolver cuando validate es true', () => mdLinks(path, { validate: true })
+    .then(response => {
+      expect(typeof (response)).toBe('object');
+    }));
+  it('Deberia devolver cuando no se ingresa una ruta', () => mdLinks()
+    .catch(err => {
+      expect(err).toBe('Ingrese una ruta');
+    }));
+  it('Deberia devolver cuando la ruta no existe', () => mdLinks('index', { validate: true })
+    .catch(err => {
+      expect(err).toBe('La ruta no existe');
+    }));
+  it('Deberia devolver cuando no hay links en el archivo', () => mdLinks('testDirTwo', { validate: true })
+    .catch(err => {
+      expect(err).toBe('No hay links');
+    }));
+  it('Deberia devolver cuando la ruta ingresada no es un archivo .md', () => mdLinks('index.js', { validate: true })
+    .catch(err => {
+      expect(err).toBe('No es un archivo .md');
+    }));
+});
