@@ -12,7 +12,7 @@
 
 ## 1. Diagrama de Flujo
 
-![Diagrama de flujo](MD-Links-diagrama.png)
+![Diagrama de flujo](MD-Links.diagrama.png)
 
 ## 2. Instalación
 
@@ -144,8 +144,8 @@ Broken: 1
 
 ## 5. Dependencias
 
--File system [file system](https://nodejs.org/api/fs.html)
--Path [path](https://nodejs.dev/learn/nodejs-file-paths)
--Axios [axios](https://www.npmjs.com/package/axios)
--Yargs [yargs](https://www.npmjs.com/package/yargs)
--Chalk [chalk](https://www.npmjs.com/package/chalk)
+- [File system](https://nodejs.org/api/fs.html)
+- [Path](https://nodejs.dev/learn/nodejs-file-paths)
+- [Axios](https://www.npmjs.com/package/axios)
+- [Yargs](https://www.npmjs.com/package/yargs)
+- [Chalk](https://www.npmjs.com/package/chalk)
