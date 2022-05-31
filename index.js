@@ -69,7 +69,6 @@ const extractLinks = (path) => {
 const stats = (fileLinks) => {
   const fileLinksUnique = new Set(fileLinks.map(e => e.href));
   return {
-    file: fileLinks[0].file,
     total: fileLinks.length,
     unique: fileLinksUnique.size,
   }
