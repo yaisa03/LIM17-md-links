@@ -17,21 +17,21 @@ describe('pathToAbsolute', () => {
 
 describe('getPathFiles', () => {
   it('deberia devolver el contenido de las rutas', () => {
-    const file = 'D:\\Laboratoria\\LIM17-md-links\\testDirThree';
+    const file = 'D:\\Laboratoria\\LIM17-md-links\\test\\testDirThree';
     expect(typeof getPathFiles(file)).toBe('object');
   })
 })
 
 describe('extractLinks', () => {
   it('deberia devolver los links extraidos de las rutas', () => {
-    const file = 'D:\\Laboratoria\\LIM17-md-links\\testDirThree';
+    const file = 'D:\\Laboratoria\\LIM17-md-links\\test\\testDirThree';
     expect(typeof extractLinks(file)).toBe('object');
   })
 })
 
 describe('stats', () => {
   it('deberia devolver datos de los links extraidos de las rutas', () => {
-    const file = 'D:\\Laboratoria\\LIM17-md-links\\testDirThree';
+    const file = 'D:\\Laboratoria\\LIM17-md-links\\test\\testDirThree';
     const fileLinks = extractLinks(file);
     expect(typeof stats(fileLinks)).toBe('object');
   })
@@ -39,14 +39,14 @@ describe('stats', () => {
 
 const mockData = [
   {
-    "file": "D:\\Laboratoria\\LIM17-md-links\\testDirThree\\file.md",
+    "file": "D:\\Laboratoria\\LIM17-md-links\\test\\testDirThree\\file.md",
     "href": "https://google.com",
     "status": 200,
     "statusText": "OK",
     "text": "other one link"
   },
   {
-    "file": "D:\\Laboratoria\\LIM17-md-links\\testDirThree\\file.md",
+    "file": "D:\\Laboratoria\\LIM17-md-links\\test\\testDirThree\\file.md",
     "href": "https://google.com",
     "status": 200,
     "statusText": "OK",
@@ -55,12 +55,12 @@ const mockData = [
 ]
 describe('validate', () => {
   it('deberia devolver un object', () => {
-    const file = 'D:\\Laboratoria\\LIM17-md-links\\testDirThree';
+    const file = 'D:\\Laboratoria\\LIM17-md-links\\test\\testDirThree';
     const fileLinks = extractLinks(file);
     expect(typeof validate(fileLinks)).toBe('object');
   })
   it('deberia devolver datos de los links extraidos de las rutas', () => {
-    const file = 'D:\\Laboratoria\\LIM17-md-links\\testDirThree';
+    const file = 'D:\\Laboratoria\\LIM17-md-links\\test\\testDirThree';
     const fileLinks = extractLinks(file);
     return expect(validate(fileLinks)).resolves.toEqual(mockData);
   })
@@ -68,16 +68,16 @@ describe('validate', () => {
 
 describe('statsAndValidate', () => {
   it('deberia devolver datos de los links extraidos de las rutas', () => {
-    const file = 'D:\\Laboratoria\\LIM17-md-links\\testDirThree';
+    const file = 'D:\\Laboratoria\\LIM17-md-links\\test\\testDirThree';
     const fileLinks = extractLinks(file);
     expect(typeof statsAndValidate(fileLinks)).toBe('object');
   })
   it('deberia devolver datos de los links extraidos de las rutas', () => {
-    const file = 'D:\\Laboratoria\\LIM17-md-links\\testDirThree';
+    const file = 'D:\\Laboratoria\\LIM17-md-links\\test\\testDirThree';
     const fileLinks = extractLinks(file);
     const linksData = {
       "broken": 0,
-      "file": "D:\\Laboratoria\\LIM17-md-links\\testDirThree\\file.md",
+      "file": "D:\\Laboratoria\\LIM17-md-links\\test\\testDirThree\\file.md",
       "total": 2,
       "unique": 1
     }
@@ -99,7 +99,7 @@ describe('statsAndValidate', () => {
 })
 
 describe('mdLinks', () => {
-  const path = 'testDirThree';
+  const path = 'test\\testDirThree';
   it('Deberia devolver cuando validate es false', () => mdLinks(path, { validate: false })
     .then(response => {
       expect(typeof (response)).toBe('object');
@@ -116,7 +116,7 @@ describe('mdLinks', () => {
     .catch(err => {
       expect(err).toBe('La ruta no existe');
     }));
-  it('Deberia devolver cuando no hay links en el archivo', () => mdLinks('testDirTwo', { validate: true })
+  it('Deberia devolver cuando no hay links en el archivo', () => mdLinks('test\\testDirThree\\testDirOne\\fileThree.md', { validate: true })
     .catch(err => {
       expect(err).toBe('No hay links');
     }));
