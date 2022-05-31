@@ -4,7 +4,7 @@
   "description": "Terminal string get links in markdown files to get info",
   "author": "Yaisa Arteaga <yaisamichellea@gmail.com> (https://www.linkedin.com/in/yaisa-arteaga/)",
   "license": "ISC",
-  "main": "index.js",
+  "main": "api.js",
   "files": [
     "index.js",
     "cli.js",
