@@ -69,7 +69,7 @@ const extractLinks = (path) => {
 const stats = (fileLinks) => {
   const fileLinksUnique = new Set(fileLinks.map(e => e.href));
   return {
-    file: fileLinks[1].file,
+    file: fileLinks[0].file,
     total: fileLinks.length,
     unique: fileLinksUnique.size,
   }
@@ -80,16 +80,16 @@ const validate = (fileLinks) => {
   const linksInfo = fileLinks.map(content => {
     const statusInfo = axios.get(content.href)
       .then((response) => {
-        return {
-          ...content,
-          status: response.status,
-          statusText: response.statusText
-        }
+          return {
+            ...content,
+            status: response.status,
+            statusText: response.statusText
+          };
       })
       .catch((error) => {
         return {
           ...content,
-          status: error.code,
+          status: error.response.status,
           statusText: 'fail'
         }
       });

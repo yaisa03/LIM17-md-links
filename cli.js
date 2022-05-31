@@ -32,7 +32,7 @@ const inputOptions = (paths, options) => {
     if (options.stats && options.validate) {
         mdLinks(paths, options).then((validStats) => {
             statsAndValidate(validStats).then((stats) => {
-                console.log(chalk.magenta(`${stats.file}`));
+                console.log(chalk.magenta(stats.file));
                 console.log(chalk.green(`Total: ${stats.total}`));
                 console.log(chalk.blue(`Unique: ${stats.unique}`));
                 console.log(chalk.red(`Broken: ${stats.broken}`));
@@ -42,14 +42,14 @@ const inputOptions = (paths, options) => {
     } else if (options.validate) {
         mdLinks(paths, options).then((files) => {
             files.forEach((fileInfo) => {
-                console.log(chalk.blue(`${fileInfo.file}`), chalk.green(`${fileInfo.href}`), fileInfo.statusText, fileInfo.status);
+                console.log(chalk.blue(fileInfo.file), chalk.green(fileInfo.href), chalk.magenta(fileInfo.statusText), fileInfo.status);
             })
         }).catch(err => console.log(chalk.red(err)));
 
     } else if (options.stats) {
         mdLinks(paths, options).then((pathLinks) => {
             const linkStats = stats(pathLinks);
-            console.log(chalk.magenta(`${linkStats.file}`));
+            console.log(chalk.magenta(linkStats.file));
             console.log(chalk.green(`Total: ${linkStats.total}`));
             console.log(chalk.blue(`Unique: ${linkStats.unique}`));
         }).catch(err => console.log(chalk.red(err)));
@@ -60,7 +60,7 @@ const inputOptions = (paths, options) => {
                 console.log(chalk.red(pathInfo));
             } else {
                 pathInfo.forEach(content => {
-                    console.log(chalk.blue(`${content.file}`), chalk.green(`${content.href}`), `${content.text}`);
+                    console.log(chalk.blue(content.file), chalk.green(content.href), content.text);
                 });
             }
         }).catch(err => console.log(chalk.red(err)));

@@ -73,7 +73,7 @@ describe('statsAndValidate', () => {
     expect(typeof statsAndValidate(fileLinks)).toBe('object');
   })
   it('deberia devolver datos de los links extraidos de las rutas', () => {
-    const file = 'D:\\Laboratoria\\LIM17-md-links\\test\\testDirThree';
+    const file = 'D:\\Laboratoria\\LIM17-md-links\\test\\testDirThree\\file.md';
     const fileLinks = extractLinks(file);
     const linksData = {
       "broken": 0,
@@ -84,13 +84,13 @@ describe('statsAndValidate', () => {
     return expect(statsAndValidate(fileLinks)).resolves.toEqual(linksData);
   })
 
-  const file = 'D:\\Laboratoria\\LIM17-md-links\\README.md';
+  const file = 'D:\\Laboratoria\\LIM17-md-links\\test\\testDirTwo\\fileTwo.md';
   const fileLinks = extractLinks(file);
   const linksData = {
-    "broken": 4,
-    "file": "D:\\Laboratoria\\LIM17-md-links\\README.md",
-    "total": 71,
-    "unique": 67
+    "broken": 1,
+    "file": "D:\\Laboratoria\\LIM17-md-links\\test\\testDirTwo\\fileTwo.md",
+    "total": 2,
+    "unique": 2
   }
   it('deberia devolver datos de los links extraidos de las rutas', () => statsAndValidate(fileLinks)
     .then(response => {
@@ -116,7 +116,7 @@ describe('mdLinks', () => {
     .catch(err => {
       expect(err).toBe('La ruta no existe');
     }));
-  it('Deberia devolver cuando no hay links en el archivo', () => mdLinks('test\\testDirThree\\testDirOne\\fileThree.md', { validate: true })
+  it('Deberia devolver cuando no hay links en el archivo', () => mdLinks('test\\testDirThree\\testDirOne\\file.md', { validate: true })
     .catch(err => {
       expect(err).toBe('No hay links');
     }));
