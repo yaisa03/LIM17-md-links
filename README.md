@@ -1,5 +1,7 @@
 # Markdown Links
 
+Librería que lee los Links contenidos en archivos Markdown, verifica si los links están rotos o no son válidos y ofrece estadisticas de links totales y unicos.
+
 ## Índice
 
 * [1. Diagrama de Flujo](#1-diagrama-de-flujo)
